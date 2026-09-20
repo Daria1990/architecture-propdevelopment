@@ -1,0 +1,19 @@
+# Трафик разрешён только внутри пары: front-end <-> back-end-api, admin-front-end <-> admin-back-end-api.
+# Всё остальное к этим подам запрещено.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: non-admin-api-allow}
+spec:
+  podSelector: {matchExpressions: [{key: role, operator: In, values: [front-end, back-end-api]}]}
+  policyTypes: [Ingress]
+  ingress:
+  - from: [{podSelector: {matchExpressions: [{key: role, operator: In, values: [front-end, back-end-api]}]}}]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: admin-api-allow}
+spec:
+  podSelector: {matchExpressions: [{key: role, operator: In, values: [admin-front-end, admin-back-end-api]}]}
+  policyTypes: [Ingress]
+  ingress:
+  - from: [{podSelector: {matchExpressions: [{key: role, operator: In, values: [admin-front-end, admin-back-end-api]}]}}]
